@@ -6,24 +6,29 @@ import (
 )
 
 type event interface {
-	AddEvent(event model.Event) error
+	AddEvent(event model.Event) (int64, error)
 	GetAllEvents() ([]model.Event, error)
 }
 
-func (r ApiPostgres) AddEvent(event model.Event) error {
+func (r ApiPostgres) AddEvent(event model.Event) (int64, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	addEvent := fmt.Sprintf("INSERT INTO %s (path, file_name, type, time) values ($1, $2, $3, $4)", r.dbTables.EventTable)
-	_, err = tx.Exec(addEvent, event.Path, event.FileName, event.EventType, event.Time)
+	result, err := tx.Exec(addEvent, event.Path, event.FileName, event.EventType, event.Time)
+
 	if err != nil {
 		tx.Rollback()
-		return err
+		return -1, err
 	}
 
-	return tx.Commit()
+	if tx.Commit() != nil {
+		return -1, err
+	}
+
+	return result.LastInsertId()
 }
 
 func (r ApiPostgres) GetAllEvents() ([]model.Event, error) {
