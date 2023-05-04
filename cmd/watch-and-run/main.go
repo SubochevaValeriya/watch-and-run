@@ -3,27 +3,31 @@ package main
 import (
 	"context"
 	"fmt"
+	gotoenv "github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"watchAndRun/configs"
 	worker "watchAndRun/internal/app/watch-and-run"
 	"watchAndRun/internal/app/watch-and-run/repository"
 )
 
 func main() {
 
-	path, err := os.Getwd()
-	fmt.Println(path)
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 	logrus.Println("Reading configs")
-	config, err := parseConfig("./configs/config.yaml")
+	config, err := configs.ParseConfig("./configs/config.yaml")
 	if err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
+	if err := gotoenv.Load(); err != nil {
+		logrus.Fatalf("error loading env variables: %s", err.Error())
+	}
 	wg := sync.WaitGroup{}
-
+	fmt.Println(config.ChangeCheckFrequency)
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     os.Getenv("host"),
 		Port:     config.DBConfig.Port,
@@ -43,12 +47,12 @@ func main() {
 	service := worker.NewService(repos)
 	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 
+	wg.Add(1)
 	for i, path := range config.PathAndCommands {
-		wg.Add(1)
 		fmt.Println(i)
-		go func(i PathAndCommands) {
+		go func(i configs.PathAndCommands) {
 			defer wg.Done()
-			service.Watch(ctx, implementDirectoryStructure(path), config.ChangeCheckFrequency)
+			service.Watch(ctx, configs.ImplementDirectoryStructure(path), config.ChangeCheckFrequency)
 		}(path)
 	}
 
@@ -57,13 +61,14 @@ func main() {
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 
-	logrus.Print("App Shutting Down")
+	logrus.Println("App Shutting Down")
 
 	if err := db.Close(); err != nil {
 		logrus.Errorf("error occured on db connection close: %s", err.Error())
 	}
 
 	wg.Wait()
+	logrus.Println("Finished")
 }
 
 //db, err := repository.NewPostgresDB(repository.Config{

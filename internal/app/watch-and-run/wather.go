@@ -46,12 +46,18 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 	// Watch only differences in files (not hidden):
 	w.AddFilterHook(filterOnlyFiles)
 
+	// Watch folder recursively for changes.
+	if err := w.AddRecursive(dir.Path); err != nil {
+		log.Fatalln(err)
+	}
+
 	go func() {
 		for {
+			fmt.Println("d")
 			select {
 			case <-ctx.Done():
 				log.Println("Canceling")
-				close(w.Event)
+				w.Close()
 				return
 			case event := <-w.Event:
 				fmt.Println(event)
@@ -107,11 +113,6 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 		}
 	}()
 
-	// Watch folder recursively for changes.
-	if err := w.AddRecursive(dir.Path); err != nil {
-		log.Fatalln(err)
-	}
-
 	// Wait after watcher started.
 	go func() {
 		w.Wait()
@@ -121,6 +122,7 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 	if err := w.Start(changeCheckFrequency); err != nil {
 		log.Fatalln(err)
 	}
+
 }
 
 func filterOnlyFiles(info os.FileInfo, fullPath string) error {
