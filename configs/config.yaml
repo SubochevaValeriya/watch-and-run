@@ -9,6 +9,8 @@ db_tables:
   event: event
   launch: launch
 
+change_check_frequency: 1s
+
 path_and_commands:
   - path: C:\Users\MSI-PC\GolandProjects\watch-and-run
     commands:

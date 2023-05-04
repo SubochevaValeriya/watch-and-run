@@ -5,13 +5,15 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"regexp"
+	"time"
 	"watchAndRun/internal/app/watch-and-run/model"
 )
 
 type globalConfig struct {
-	DBConfig        DBConfig          `yaml:"db"`
-	DBTables        DBTables          `yaml:"db_tables"`
-	PathAndCommands []PathAndCommands `yaml:"path_and_commands"`
+	DBConfig             DBConfig          `yaml:"db"`
+	DBTables             DBTables          `yaml:"db_tables"`
+	PathAndCommands      []PathAndCommands `yaml:"path_and_commands"`
+	ChangeCheckFrequency time.Duration     `yaml:"change-check-frequency"`
 }
 
 type DBConfig struct {
