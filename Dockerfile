@@ -14,6 +14,6 @@ RUN chmod +x wait-for-postgres.sh
 
 # build go app
 RUN go mod download
-RUN go build -o watch-and-run .cmd/main.go
+RUN go build -o watch-and-run ./cmd/watch-and-run/main.go
 
 CMD ["./watch-and-run"]
