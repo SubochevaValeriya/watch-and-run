@@ -1,51 +1,95 @@
 package main
 
 import (
-	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	// Create new watcher.
-	watcher, err := fsnotify.NewWatcher()
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+	logrus.Println("Reading configs")
+	config, err := parseConfig("./configs/config.yaml")
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
-	defer watcher.Close()
 
-	// Start listening for events.
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				log.Println("event:", event)
-				if event.Has(fsnotify.Write) {
-					log.Println("modified file:", event.Name)
-				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				log.Println("error:", err)
-			}
-		}
-	}()
+	directory := implementDirectoryStructure(config.PathAndCommands)
+	//fmt.Printf("%#d", config)
 
-	// Add a path.
-	err = watcher.Add("/Users/lera/GolandProjects/watch-and-run/a")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("added")
+	//db, err := repository.NewPostgresDB(repository.Config{
+	//	Host:     os.Getenv("host"),
+	//	Port:     config.DBConfig.Port,
+	//	Username: config.DBConfig.Username,
+	//	Password: os.Getenv("DB_PASSWORD"),
+	//	DBName:   config.DBConfig.DBName,
+	//	SSLMode:  config.DBConfig.SSLMode,
+	//})
+	//if err != nil {
+	//	logrus.Fatalf("failed to inititalize db: %s", err.Error())
+	//}
+	//
+	//dbTables := repository.DbTables{EventTable: config.DBTables.Event,
+	//	LaunchTable: config.DBTables.Launch}
 
-	// Block main goroutine forever.
-	<-make(chan struct{})
+	//repos := repository.NewRepository(db, dbTables)
 
+	////app := "echo"
+	////
+	////arg0 := "-e"
+	////arg1 := "Hello world"
+	////arg2 := "\n\tfrom"
+	////arg3 := "golang"
+	//
+	//cmd := exec.Command("cmd", "/c", "echo %PROCESSOR_ARCHITECTURE%", "hehe")
+	////cmd.Run()
+	//stdout, err := cmd.Output()
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//	return
+	//}
+	//// Print the output
+	//fmt.Println(string(stdout))
 
-	runt.
-	//psth cmds
 }
+
+//
+//func main() {
+//	// Create new watcher.
+//	watcher, err := fsnotify.NewWatcher()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	defer watcher.Close()
+//
+//	// Start listening for events.
+//	go func() {
+//		for {
+//			select {
+//			case event, ok := <-watcher.Events:
+//				if !ok {
+//					return
+//				}
+//				log.Println("event:", event)
+//				if event.Has(fsnotify.Write) {
+//					log.Println("modified file:", event.Name)
+//				}
+//			case err, ok := <-watcher.Errors:
+//				if !ok {
+//					return
+//				}
+//				log.Println("error:", err)
+//			}
+//		}
+//	}()
+//
+//	// Add a path.
+//	err = watcher.Add("\\Users\\MSI-PC\\GolandProjects\\watch-and-run\\a")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println("added")
+//
+//	// Block main goroutine forever.
+//	<-make(chan struct{})
+//
+//	//psth cmds
+//}
