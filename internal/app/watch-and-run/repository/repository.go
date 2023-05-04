@@ -4,15 +4,15 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Repository interface {
+type Repo interface {
 	event
 	launch
 }
 
-type repository struct {
-	Repository
+type Repository struct {
+	Repo
 }
 
-func NewRepository(db *sqlx.DB, dbTables DbTables) *repository {
-	return &repository{NewApiPostgres(db, dbTables)}
+func NewRepository(db *sqlx.DB, dbTables DbTables) *Repository {
+	return &Repository{NewApiPostgres(db, dbTables)}
 }

@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"fmt"
 	"github.com/radovskyb/watcher"
 	"github.com/sirupsen/logrus"
@@ -21,7 +22,7 @@ func newApiService(repo repository.Repository) *ApiService {
 }
 
 type Worker interface {
-	Watch(dir model.Directory)
+	Watch(ctx context.Context, dir model.Directory, changeCheckFrequency time.Duration)
 }
 
 type Service struct {
@@ -36,7 +37,7 @@ type Watcher interface {
 	WatchChanges()
 }
 
-func (s *ApiService) Watch(dir model.Directory) {
+func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheckFrequency time.Duration) {
 	w := watcher.New()
 
 	// Only notify create, write and remove events.
@@ -48,6 +49,10 @@ func (s *ApiService) Watch(dir model.Directory) {
 	go func() {
 		for {
 			select {
+			case <-ctx.Done():
+				log.Println("Canceling")
+				close(w.Event)
+				return
 			case event := <-w.Event:
 				fmt.Println(event)
 			checkRegexp:
@@ -113,7 +118,7 @@ func (s *ApiService) Watch(dir model.Directory) {
 	}()
 
 	// Start the watching process - it'll check for changes every 100ms.
-	if err := w.Start(time.Millisecond * 100); err != nil {
+	if err := w.Start(changeCheckFrequency); err != nil {
 		log.Fatalln(err)
 	}
 }
