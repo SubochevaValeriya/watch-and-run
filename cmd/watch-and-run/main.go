@@ -1,55 +1,70 @@
 package main
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
+	"os"
+	"sync"
+	worker "watchAndRun/internal/app/watch-and-run"
 )
 
 func main() {
+
+	path, err := os.Getwd()
+	fmt.Println(path)
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 	logrus.Println("Reading configs")
 	config, err := parseConfig("./configs/config.yaml")
 	if err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
+	wg := sync.WaitGroup{}
+	//fmt.Println(config.PathAndCommands[0].Path)
+	for i, path := range config.PathAndCommands {
+		wg.Add(1)
+		fmt.Println(i)
+		go func(i PathAndCommands) {
+			defer wg.Done()
+			worker.Watch(implementDirectoryStructure(path))
+		}(path)
+	}
 
-	directory := implementDirectoryStructure(config.PathAndCommands)
-	//fmt.Printf("%#d", config)
-
-	//db, err := repository.NewPostgresDB(repository.Config{
-	//	Host:     os.Getenv("host"),
-	//	Port:     config.DBConfig.Port,
-	//	Username: config.DBConfig.Username,
-	//	Password: os.Getenv("DB_PASSWORD"),
-	//	DBName:   config.DBConfig.DBName,
-	//	SSLMode:  config.DBConfig.SSLMode,
-	//})
-	//if err != nil {
-	//	logrus.Fatalf("failed to inititalize db: %s", err.Error())
-	//}
-	//
-	//dbTables := repository.DbTables{EventTable: config.DBTables.Event,
-	//	LaunchTable: config.DBTables.Launch}
-
-	//repos := repository.NewRepository(db, dbTables)
-
-	////app := "echo"
-	////
-	////arg0 := "-e"
-	////arg1 := "Hello world"
-	////arg2 := "\n\tfrom"
-	////arg3 := "golang"
-	//
-	//cmd := exec.Command("cmd", "/c", "echo %PROCESSOR_ARCHITECTURE%", "hehe")
-	////cmd.Run()
-	//stdout, err := cmd.Output()
-	//if err != nil {
-	//	fmt.Println(err.Error())
-	//	return
-	//}
-	//// Print the output
-	//fmt.Println(string(stdout))
-
+	wg.Wait()
 }
+
+//db, err := repository.NewPostgresDB(repository.Config{
+//	Host:     os.Getenv("host"),
+//	Port:     config.DBConfig.Port,
+//	Username: config.DBConfig.Username,
+//	Password: os.Getenv("DB_PASSWORD"),
+//	DBName:   config.DBConfig.DBName,
+//	SSLMode:  config.DBConfig.SSLMode,
+//})
+//if err != nil {
+//	logrus.Fatalf("failed to inititalize db: %s", err.Error())
+//}
+//
+//dbTables := repository.DbTables{EventTable: config.DBTables.Event,
+//	LaunchTable: config.DBTables.Launch}
+
+//repos := repository.NewRepository(db, dbTables)
+
+////app := "echo"
+////
+////arg0 := "-e"
+////arg1 := "Hello world"
+////arg2 := "\n\tfrom"
+////arg3 := "golang"
+//
+//cmd := exec.Command("cmd", "/c", "echo %PROCESSOR_ARCHITECTURE%", "hehe")
+////cmd.Run()
+//stdout, err := cmd.Output()
+//if err != nil {
+//	fmt.Println(err.Error())
+//	return
+//}
+//// Print the output
+//fmt.Println(string(stdout))
 
 //
 //func main() {
