@@ -1,4 +1,4 @@
-package main
+package configs
 
 import (
 	"fmt"
@@ -13,21 +13,21 @@ type globalConfig struct {
 	DBConfig             DBConfig          `yaml:"db"`
 	DBTables             DBTables          `yaml:"db_tables"`
 	PathAndCommands      []PathAndCommands `yaml:"path_and_commands"`
-	ChangeCheckFrequency time.Duration     `yaml:"change-check-frequency"`
+	ChangeCheckFrequency time.Duration     `yaml:"change_check_frequency"`
 }
 
 type DBConfig struct {
-	Host     string `yaml:"db.host"`
-	Port     string `yaml:"db.port"`
-	Username string `yaml:"db.username"`
-	Password string `yaml:"db.password"`
-	DBName   string `yaml:"db.dbname"`
-	SSLMode  string `yaml:"db.sslmode"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbname"`
+	SSLMode  string `yaml:"sslmode"`
 }
 
 type DBTables struct {
-	Event  string `yaml:"dbTables.event"`
-	Launch string `yaml:"dbTables.launch"`
+	Event  string `yaml:"event"`
+	Launch string `yaml:"launch"`
 }
 
 type PathAndCommands struct {
@@ -38,7 +38,7 @@ type PathAndCommands struct {
 	LogFile       string   `yaml:"log_file"`
 }
 
-func parseConfig(path string) (globalConfig, error) {
+func ParseConfig(path string) (globalConfig, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return globalConfig{}, fmt.Errorf("can't parse config: '%w'", err)
@@ -51,7 +51,7 @@ func parseConfig(path string) (globalConfig, error) {
 	return conf, nil
 }
 
-func implementDirectoryStructure(PathAndCommands PathAndCommands) model.Directory {
+func ImplementDirectoryStructure(PathAndCommands PathAndCommands) model.Directory {
 	directory := model.Directory{
 		Path:          PathAndCommands.Path,
 		Commands:      PathAndCommands.Commands,

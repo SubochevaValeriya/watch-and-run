@@ -12,7 +12,7 @@ db_tables:
 change_check_frequency: 1s
 
 path_and_commands:
-  - path: C:\Users\MSI-PC\GolandProjects\watch-and-run
+  - path: /home/valeriya/GolandProjects/watch-and-run
     commands:
       - go build -o ./build/bin/app1 cmd/service/main.go
       - go run ./build/bin/app1
