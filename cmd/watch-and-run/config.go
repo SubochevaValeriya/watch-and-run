@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
+	"regexp"
 	"watchAndRun/internal/app/watch-and-run/model"
 )
 
@@ -41,17 +42,15 @@ func parseConfig(path string) (globalConfig, error) {
 		return globalConfig{}, fmt.Errorf("can't parse config: '%w'", err)
 	}
 	conf := globalConfig{}
-	fmt.Printf("content='%#v'\n", string(content))
 	err = yaml.Unmarshal(content, &conf)
 	if err != nil {
 		return globalConfig{}, fmt.Errorf("can't parse config: '%w'", err)
 	}
-	fmt.Printf("conf='%#v'\n", conf)
 	return conf, nil
 }
 
 func implementDirectoryStructure(PathAndCommands PathAndCommands) model.Directory {
-	result := model.PathAndCommands{
+	directory := model.Directory{
 		Path:          PathAndCommands.Path,
 		Commands:      PathAndCommands.Commands,
 		IncludeRegexp: nil,
@@ -59,12 +58,13 @@ func implementDirectoryStructure(PathAndCommands PathAndCommands) model.Director
 		LogFile:       PathAndCommands.LogFile,
 	}
 
-	for _, regexp := range PathAndCommands.IncludeRegexp {
-		result.IncludeRegexp[regexp] = struct{}{}
+	for _, regex := range PathAndCommands.IncludeRegexp {
+		directory.IncludeRegexp = append(directory.IncludeRegexp, regexp.MustCompile(regex))
+
 	}
-	for _, regexp := range PathAndCommands.ExcludeRegexp {
-		result.ExcludeRegexp[regexp] = struct{}{}
+	for _, regex := range PathAndCommands.ExcludeRegexp {
+		directory.ExcludeRegexp = append(directory.ExcludeRegexp, regexp.MustCompile(regex))
 	}
 
-	return result
+	return directory
 }

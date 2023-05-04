@@ -10,7 +10,7 @@ db_tables:
   launch: launch
 
 path_and_commands:
-  - path: /home/user/project1
+  - path: C:\Users\MSI-PC\GolandProjects\watch-and-run
     commands:
       - go build -o ./build/bin/app1 cmd/service/main.go
       - go run ./build/bin/app1
@@ -20,12 +20,12 @@ path_and_commands:
     exclude_regexp:
           - .*._test.go$
     log_file: /tmp/log2.out
-  - path: /home/user/project2
-    commands:
-      - go test ./...
-    include_regexp:
-        - .*.go$
-        - .*.env$
-    exclude_regexp:
-          - .*._test.go$
-    log_file: /tmp/log2.out
+#  - path: C:\Users\MSI-PC\GolandProjects\watch-and-run
+#    commands:
+#      - go test ./...
+#    include_regexp:
+#        - .*.go$
+#        - .*.env$
+#    exclude_regexp:
+#          - .*._test.go$
+#    log_file: /tmp/log2.out
