@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	_ "database/sql"
 	gotoenv "github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -27,7 +27,6 @@ func main() {
 		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 	wg := sync.WaitGroup{}
-	fmt.Println(config.ChangeCheckFrequency)
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     os.Getenv("host"),
 		Port:     config.DBConfig.Port,
@@ -47,10 +46,9 @@ func main() {
 	service := worker.NewService(repos)
 	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 
-	wg.Add(1)
-	for i, path := range config.PathAndCommands {
-		fmt.Println(i)
-		go func(i configs.PathAndCommands) {
+	for _, path := range config.PathAndCommands {
+		wg.Add(1)
+		go func(path configs.PathAndCommands) {
 			defer wg.Done()
 			service.Watch(ctx, configs.ImplementDirectoryStructure(path), config.ChangeCheckFrequency)
 		}(path)

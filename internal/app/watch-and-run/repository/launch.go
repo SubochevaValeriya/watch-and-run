@@ -16,9 +16,9 @@ func (r ApiPostgres) AddLaunch(launch model.Launch) error {
 		return err
 	}
 
-	addLaunch := fmt.Sprintf("INSERT INTO %s (event_id, command, start_time, end_time, result) values ($1, $2, $3, $4, %5)", r.dbTables.LaunchTable)
+	addLaunch := fmt.Sprintf("INSERT INTO %s (event_id, command, start_time, end_time, result) values ($1, $2, $3, $4, $5)", r.dbTables.LaunchTable)
+	_, err = tx.Exec(addLaunch, launch.EventId, launch.Command, launch.StartTime, launch.EndTime, launch.Result)
 	if err != nil {
-		_, err = tx.Exec(addLaunch, launch.EventId, launch.Command, launch.StartTime, launch.EndTime, launch.Result)
 		tx.Rollback()
 		return err
 	}

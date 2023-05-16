@@ -15,9 +15,12 @@ func (r ApiPostgres) AddEvent(event model.Event) (int64, error) {
 	if err != nil {
 		return -1, err
 	}
-
-	addEvent := fmt.Sprintf("INSERT INTO %s (path, file_name, type, time) values ($1, $2, $3, $4)", r.dbTables.EventTable)
-	result, err := tx.Exec(addEvent, event.Path, event.FileName, event.EventType, event.Time)
+	var id int64
+	addEvent := fmt.Sprintf("INSERT INTO %s (path, file_name, type, time) values ($1, $2, $3, $4) RETURNING id", r.dbTables.EventTable)
+	err = tx.QueryRow(addEvent, event.Path, event.FileName, event.EventType, event.Time).Scan(&id)
+	//
+	//result, err := tx.QueryRow()
+	//tx.Exec(addEvent, event.Path, event.FileName, event.EventType, event.Time)
 
 	if err != nil {
 		tx.Rollback()
@@ -28,7 +31,7 @@ func (r ApiPostgres) AddEvent(event model.Event) (int64, error) {
 		return -1, err
 	}
 
-	return result.LastInsertId()
+	return id, nil
 }
 
 func (r ApiPostgres) GetAllEvents() ([]model.Event, error) {

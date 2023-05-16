@@ -53,14 +53,12 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 
 	go func() {
 		for {
-			fmt.Println("d")
 			select {
 			case <-ctx.Done():
 				log.Println("Canceling")
 				w.Close()
 				return
 			case event := <-w.Event:
-				fmt.Println(event)
 			checkRegexp:
 				for _, regexpIncl := range dir.IncludeRegexp {
 					if regexpIncl.MatchString(event.Name()) {
@@ -69,7 +67,7 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 								break checkRegexp
 							}
 						}
-
+						fmt.Println(event)
 						currentEvent := model.Event{
 							Id:        0,
 							Path:      dir.Path,
@@ -80,9 +78,8 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 
 						eventId, err := s.repo.AddEvent(currentEvent)
 						if err != nil {
-							logrus.Errorf("Can't save event data: %w", err)
+							logrus.Errorf("Can't save event data: %s", err)
 						}
-
 						for _, command := range dir.Commands {
 							launch := model.Launch{
 								Id:        0,
@@ -93,12 +90,21 @@ func (s *ApiService) Watch(ctx context.Context, dir model.Directory, changeCheck
 								EventId:   int(eventId),
 							}
 
+							fmt.Println(command, dir.LogFile)
 							err := executeCommand(command, dir.LogFile)
 							launch.EndTime = time.Now()
 							if err == nil {
 								launch.Result = "success"
+								err = s.repo.AddLaunch(launch)
+								if err != nil {
+									logrus.Errorf("Can't save launch data: %v", err)
+								}
 							} else {
 								launch.Result = "failure"
+								err = s.repo.AddLaunch(launch)
+								if err != nil {
+									logrus.Errorf("Can't save launch data: %v", err)
+								}
 								break
 							}
 						}
