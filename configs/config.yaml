@@ -1,7 +1,7 @@
 db:
   username: "postgres"
   host: "localhost"
-  port: "5432"
+  port: "5433"
   dbname: "postgres"
   sslmode: "disable"
 
@@ -12,22 +12,25 @@ db_tables:
 change_check_frequency: 1s
 
 path_and_commands:
-  - path: /home/valeriya/GolandProjects/watch-and-run
+  - path: /Users/lera/GolandProjects/watch-and-run/a
     commands:
-      - go build -o ./build/bin/app1 cmd/service/main.go
-      - go run ./build/bin/app1
+      - echo a first
+      - echo a second
     include_regexp:
-        - .*.go$
-        - .*.env$
+      - .*.txt$
+      - .*.go$
+      - .*.env$
     exclude_regexp:
-          - .*._test.go$
-    log_file: /tmp/log2.out
-#  - path: C:\Users\MSI-PC\GolandProjects\watch-and-run
-#    commands:
-#      - go test ./...
-#    include_regexp:
-#        - .*.go$
-#        - .*.env$
-#    exclude_regexp:
-#          - .*._test.go$
-#    log_file: /tmp/log2.out
+      - .*._test.go$
+    log_file: /Users/lera/GolandProjects/watch-and-run/tmp/log2.out
+  - path: /Users/lera/GolandProjects/watch-and-run/b
+    commands:
+      - echo b first
+      - echo b second
+    include_regexp:
+      - .*.txt$
+      - .*.go$
+      - .*.env$
+    exclude_regexp:
+      - .*._test.go$
+    log_file: /Users/lera/GolandProjects/watch-and-run/tmp/log2.out
