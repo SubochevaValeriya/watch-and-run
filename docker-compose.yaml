@@ -3,6 +3,7 @@ version: '3.9'
 services:
   watch-and-run:
     build: ./
+    command: ./wait-for-postgres.sh db ./watch-and-run
     ports:
       - "8080:8080"
     depends_on:
@@ -21,4 +22,4 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=qwerty
     ports:
-      - "5432:5432"
+      - "5433:5432"
