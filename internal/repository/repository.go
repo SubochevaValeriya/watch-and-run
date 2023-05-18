@@ -4,18 +4,18 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type EventRepository struct {
-	event
+type eventRepository struct {
+	db *sqlx.DB
 }
 
-type LaunchRepository struct {
-	launch
+type launchRepository struct {
+	db *sqlx.DB
 }
 
-func NewEventRepository(db *sqlx.DB) *EventRepository {
-	return &EventRepository{NewApiPostgres(db)}
+func NewEventRepository(db *sqlx.DB) Event {
+	return &eventRepository{db: db}
 }
 
-func NewLaunchRepository(db *sqlx.DB) *LaunchRepository {
-	return &LaunchRepository{NewApiPostgres(db)}
+func NewLaunchRepository(db *sqlx.DB) Launch {
+	return &launchRepository{db}
 }

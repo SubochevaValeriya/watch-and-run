@@ -14,8 +14,8 @@ import (
 )
 
 type Watcher struct {
-	EventRepo  repository.EventRepository
-	LaunchRepo repository.LaunchRepository
+	EventRepo  repository.Event
+	LaunchRepo repository.Launch
 }
 
 func (wat *Watcher) Watch(ctx context.Context, dir model.Directory, changeCheckFrequency time.Duration) {
@@ -32,7 +32,7 @@ func (wat *Watcher) Watch(ctx context.Context, dir model.Directory, changeCheckF
 		log.Fatalln(err)
 	}
 
-	go func() { //у тебя Watch и так в горутине запускается
+	go func() {
 		for {
 			select {
 			case <-ctx.Done():
@@ -40,8 +40,9 @@ func (wat *Watcher) Watch(ctx context.Context, dir model.Directory, changeCheckF
 				w.Close()
 				return
 			case event := <-w.Event:
+				fmt.Printf("event='%+v'\n", event)
 				if isNeedHandle(dir, event) {
-					err := wat.Handle(dir, event)
+					err := wat.handle(dir, event)
 					if err != nil {
 						logrus.Errorf("Can't handle event: %s", err)
 					} else {
@@ -54,11 +55,6 @@ func (wat *Watcher) Watch(ctx context.Context, dir model.Directory, changeCheckF
 				return
 			}
 		}
-	}()
-
-	// Wait after watcher started.
-	go func() {
-		w.Wait()
 	}()
 
 	if err := w.Start(changeCheckFrequency); err != nil {
@@ -102,7 +98,7 @@ func isNeedHandle(dir model.Directory, event watcher.Event) bool {
 	return false
 }
 
-func (wat *Watcher) Handle(dir model.Directory, event watcher.Event) error {
+func (wat *Watcher) handle(dir model.Directory, event watcher.Event) error {
 	currentEvent := model.Event{
 		Path:      dir.Path,
 		FileName:  event.Name(),

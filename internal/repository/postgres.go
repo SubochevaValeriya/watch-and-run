@@ -22,11 +22,3 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 
 	return db, nil
 }
-
-type ApiPostgres struct {
-	db *sqlx.DB
-}
-
-func NewApiPostgres(db *sqlx.DB) *ApiPostgres {
-	return &ApiPostgres{db: db}
-}

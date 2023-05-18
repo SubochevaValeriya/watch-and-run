@@ -17,10 +17,24 @@ func executeCommand(command string, logFile string) error {
 		return err
 	}
 
-	err = os.WriteFile(logFile, stdout, 0644)
+	err = writeFile(logFile, stdout)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func writeFile(filename string, data []byte) error {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if _, err = f.Write(data); err != nil {
+		return err
+	}
 	return nil
 }

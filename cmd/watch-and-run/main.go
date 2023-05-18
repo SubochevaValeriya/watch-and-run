@@ -42,7 +42,7 @@ func main() {
 
 	eventRepo := repository.NewEventRepository(db)
 	launchRepo := repository.NewLaunchRepository(db)
-	watcher := watcher.Watcher{EventRepo: *eventRepo, LaunchRepo: *launchRepo}
+	watcher := watcher.Watcher{EventRepo: eventRepo, LaunchRepo: launchRepo}
 	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 
 	wg := sync.WaitGroup{}
