@@ -24,16 +24,9 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 }
 
 type ApiPostgres struct {
-	db       *sqlx.DB
-	dbTables DbTables
+	db *sqlx.DB
 }
 
-type DbTables struct {
-	EventTable  string
-	LaunchTable string
-}
-
-func NewApiPostgres(db *sqlx.DB, dbTables DbTables) *ApiPostgres {
-	return &ApiPostgres{db: db,
-		dbTables: dbTables}
+func NewApiPostgres(db *sqlx.DB) *ApiPostgres {
+	return &ApiPostgres{db: db}
 }

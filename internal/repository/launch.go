@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"watchAndRun/internal/app/watch-and-run/model"
+	"watchAndRun/internal/model"
 )
 
 type launch interface {
@@ -10,13 +10,15 @@ type launch interface {
 	GetAllLaunches() ([]model.Launch, error)
 }
 
+const launchTable = "launch"
+
 func (r ApiPostgres) AddLaunch(launch model.Launch) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
 
-	addLaunch := fmt.Sprintf("INSERT INTO %s (event_id, command, start_time, end_time, result) values ($1, $2, $3, $4, $5)", r.dbTables.LaunchTable)
+	addLaunch := fmt.Sprintf("INSERT INTO %s (event_id, command, start_time, end_time, result) values ($1, $2, $3, $4, $5)", launchTable)
 	_, err = tx.Exec(addLaunch, launch.EventId, launch.Command, launch.StartTime, launch.EndTime, launch.Result)
 	if err != nil {
 		tx.Rollback()
@@ -29,7 +31,7 @@ func (r ApiPostgres) AddLaunch(launch model.Launch) error {
 func (r ApiPostgres) GetAllLaunches() ([]model.Launch, error) {
 	var launches []model.Launch
 
-	query := fmt.Sprintf("SELECT * FROM %s", r.dbTables.LaunchTable)
+	query := fmt.Sprintf("SELECT * FROM %s", launchTable)
 	err := r.db.Select(&launches, query)
 
 	return launches, err

@@ -6,7 +6,7 @@ import (
 	"os"
 	"regexp"
 	"time"
-	"watchAndRun/internal/app/watch-and-run/model"
+	"watchAndRun/internal/model"
 )
 
 type globalConfig struct {
