@@ -3,6 +3,7 @@ module watchAndRun
 go 1.18
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.2.0

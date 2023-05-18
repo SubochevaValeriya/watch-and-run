@@ -17,6 +17,7 @@ services:
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
+#    - "pgdata:/var/lib/postgresql/data" try use this because i have 1300 files in project dir in .database
     environment:
       - POSTGRES_DB=utp
       - POSTGRES_USER=postgres
