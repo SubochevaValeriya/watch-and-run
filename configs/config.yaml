@@ -1,13 +1,9 @@
 db:
   username: "postgres"
   host: "localhost"
-  port: "5433"
+  port: "5432"
   dbname: "postgres"
   sslmode: "disable"
-
-db_tables:
-  event: event
-  launch: launch
 
 change_check_frequency: 1s
 
