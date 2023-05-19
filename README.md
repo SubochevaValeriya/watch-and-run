@@ -8,6 +8,8 @@ Console application that allows monitor changes in various directories and execu
 
 ### To run an app:
 
+Fill in the part with Path_and_commands in configs/config.yaml.
+
 ```
 make build && make run
 ```
@@ -17,3 +19,5 @@ If you are running the application for the first time, you must apply the migrat
 ```
 make migrate
 ```
+
+Also when db is up, you can run app by go running cmd/watch-and-run/main.go.
