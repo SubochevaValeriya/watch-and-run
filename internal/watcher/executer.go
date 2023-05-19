@@ -3,6 +3,7 @@ package watcher
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -26,6 +27,15 @@ func executeCommand(command string, logFile string) error {
 }
 
 func writeFile(filename string, data []byte) error {
+	if _, err := os.Stat("sample.txt"); err != nil {
+		_ = os.MkdirAll(filepath.Dir(filename), 0777)
+		err = os.WriteFile(filename, data, 0777)
+		if err != nil {
+			return err
+		} else {
+			return nil
+		}
+	}
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
