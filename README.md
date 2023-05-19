@@ -23,4 +23,4 @@ If you are running the application for the first time, you must apply the migrat
 make migrate
 ```
 
-Also when db is up, you can run app by executing the command: go run cmd/watch-and-run/main.go.
+Also when db is up, you can run the application by executing the command: go run cmd/watch-and-run/main.go.
